@@ -55,13 +55,16 @@ const main = async () => {
     // console.log("Founding.....")
     deliveriesData.forEach(deliveryRow => {
 
-        let producsFounds = productsData.filter(productsRow => productsRow['ZBOZI_NAZEV'] === deliveryRow['orderItemName'])
+        let producsFounds = productsData.filter(productsRow => productsRow['ZBOZI_2'] === deliveryRow['merge'])
         producsFounds.forEach(function (producsFoundsRow, index) {
             // console.log(producsFoundsRow)
             // console.log(deliveryRow['ZBOZI_KUSY'])
             producsFounds[index] = { ...producsFoundsRow, 'ZBOZI_KUSY': deliveryRow['ZBOZI_KUSY'] }
+            producsFounds[index] = { ...producsFoundsRow, 'LAST4': deliveryRow['LAST4'] }
+
 
         })
+        
         // console.log(producsFounds)
         resultData = [...resultData, { deliveryRow, producsFounds }]
         // console.log(resultData)
@@ -90,12 +93,16 @@ const main = async () => {
             // console.log(uniqueReusltRow['CODE'])
             // console.log('..................')
             // console.log(index)
+
             uniqueResultData[index] = { ...uniqueReusltRow, ...constData[0] }
             uniqueResultData[index] = Object.assign(uniqueReusltRow, constData[0]);
             delete uniqueResultData[index]['ZBOZI_KUSY']
             delete uniqueResultData[index]['orderItemName']
-
-            // console.log(uniqueReusltRow)
+            delete uniqueResultData[index]['LAST4']
+            delete uniqueResultData[index]['orderItemVariantName']
+            delete uniqueResultData[index]['merge']
+            delete uniqueResultData[index]['štítek']
+                // console.log(uniqueReusltRow)
 
 
             if (!uniqueResultData[index]['producsFounds'])
@@ -103,9 +110,8 @@ const main = async () => {
             if (reusltRow['deliveryRow']['CODE'] === uniqueReusltRow['CODE']) {
                 uniqueResultData[index]['producsFounds'] = uniqueReusltRow['producsFounds'].concat(reusltRow['producsFounds'])
                 // uniqueReusltRow['producsFounds'] = uniqueReusltRow['producsFounds'].concat(reusltRow['producsFounds'])
-
             }
-
+            delete uniqueReusltRow['ZBOZI_NAZEV']
         })
 
         // console.log(constData)
@@ -113,6 +119,7 @@ const main = async () => {
     });
     // console.log(".........")
     // console.log("Formating data.....")
+
 
     let finaleData = formatingToXml(uniqueResultData)
     console.log(util.inspect(finaleData, false, null, true /* enable colors */))
